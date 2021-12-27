@@ -75,7 +75,7 @@ bool Search_element(ListElts li, char* s)
     else return false;
 }
 //--------------------------------------------------------------------------------------------------------------------------
-ListElts insert(ListElts li, info x)
+void insert(ListElts *li, info x)
 {
     élément *element;
     
@@ -90,10 +90,8 @@ ListElts insert(ListElts li, info x)
     element->inf.Type = x.Type;
     element->inf.Nature = x.Nature;
     
-    if(list_is_empty(li))
+    if(list_is_empty(*li))
         element->suivant=NULL;
     else
-        element->suivant=li;
-    
-    return element;
+        element->suivant=*li;
 }

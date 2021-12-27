@@ -36,8 +36,8 @@ DEC: DEC_VAR
 DEC_VAR : LISTE_ID deuxpoints TYPE pvg 
 ;
 
-LISTE_ID: idf barrelateral LISTE_ID {l=insert(l,{$1,x,y});}
-        | idf  {l=insert(l,{$1,x,y});}
+LISTE_ID: idf barrelateral LISTE_ID {insert($1,x,y);}
+        | idf  {insert($1,x,y);}
 ;
 
 DEC_CST: mc_define TYPE idf aff cst pvg
