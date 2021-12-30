@@ -2,6 +2,7 @@
 #include<stdio.h>
 #include"Fonctions.h"
 extern int ligne;
+extern FILE* yyin;
 extern int col;
 int yyparse();
 int yylex();
@@ -14,13 +15,14 @@ char* chaine;
 float reel;
 }
 %start S
-%token err mc_Program  mc_PDEC mc_PINST mc_Begin mc_End deuxpoints <chaine>mc_Pint <chaine>mc_Pfloat pvg mc_define 
+%token err mc_Program  mc_PDEC mc_PINST mc_Begin mc_End deuxpoints pvg mc_define mc_Pfloat mc_Pint
 %token aff division Affectation Addition Soustraction Multiplication barrelateral etcomercial pardroite pargauche 
 %token Superieur Inferieur Superieurouegal Inferieurouegal Egal different mc_FOR mc_WHILE mc_DO mc_ENDFOR mc_IF mc_ELSE
-%token <chaine>idf <entier>cst 
+%token <chaine>idf <entier>cst
+%type <entier>TYPE
 %%
 
-S : prog mc_PDEC PartieDeclaration mc_PINST mc_Begin PartieInstructions mc_End {printf("syntax correcte\n"); YYACCEPT;}
+S : prog mc_PDEC PartieDeclaration mc_PINST mc_Begin PartieInstructions mc_End {printf("syntax correcte\n"); print_list(); YYACCEPT;}
 ;
 
 prog: mc_Program idf
@@ -33,18 +35,17 @@ DEC: DEC_VAR
     | DEC_CST 
 ;
 
-DEC_VAR : LISTE_ID deuxpoints TYPE pvg 
+DEC_VAR : LIST_idf deuxpoints TYPE pvg {insert(queue_first(),0,$3); pop_queue();}
 ;
 
-LISTE_ID: idf barrelateral LISTE_ID {insert($1,x,y);}
-        | idf  {insert($1,x,y);}
+LIST_idf : idf barrelateral LIST_idf {push_queue($1);}
+        | idf {push_queue($1);}
+
+DEC_CST: mc_define TYPE idf aff cst pvg {insert($3,1,$2);}
 ;
 
-DEC_CST: mc_define TYPE idf aff cst pvg
-;
-
-TYPE: mc_Pint {$$=0}
-    | mc_Pfloat {$$=1}
+TYPE: mc_Pint {$$=0;}
+    | mc_Pfloat {$$=1;}
 ;
 
 PartieInstructions: INST PartieInstructions | INST  
@@ -81,7 +82,8 @@ int yyerror(char* msg)
     printf("%s ligne %d et colonne %d\n",msg,ligne,col);
 return 0;
 }
-int main(){   
+int main(){ 
+yyin = fopen("test.txt", "r");
 yyparse();  
 return 0;  
 } 

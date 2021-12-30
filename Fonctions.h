@@ -10,20 +10,28 @@
 
 typedef enum {false, true} bool;
 
-typedef struct info
+//def d'une liste de symbole
+typedef struct élément
 {
     char Nom[256];
     int Type; // 0=int , 1=float
     int Nature; // 0=var , 1=cst
-}info;
-
-typedef struct élément
-{
-    info inf;
     struct élément *suivant;
 }élément, *ListElts;
 
-ListElts new_list (void) {return NULL;}
+//def d'une file de nom d'idf
+typedef struct QueueElement
+{
+    char NomIdf[256];
+    struct QueueElement *next;
+}QueueElement, *Queue;
+
+//parametre de la file 
+static QueueElement *first=NULL;
+static QueueElement *last=NULL;
+
+//la liste de symbole
+ListElts symbole=NULL;
 
 //--------------------------------------------------------------------------------------------------------------------------
 bool list_is_empty(ListElts li)
@@ -48,37 +56,41 @@ int list_length(ListElts li)
 }
 //--------------------------------------------------------------------------------------------------------------------------
 
-void  print_list (ListElts li)
+void  print_list (void)
 {
-    if(list_is_empty(li))
+    ListElts temp=symbole ;
+
+    if(list_is_empty(symbole))
     {
         printf("rien a afficher liste vide \n");
         return;
     }
-    printf("\n ******************************** Table des symboles ********************************\n");
-    printf("__________________________________________________________\n");
-    printf("\t|NomEntitée | NatureEntitée\n");
-    printf("______________________________________\n");
-    while(li !=NULL)
-     {  printf("[\t%10s | %12d]\n",li->inf.Nom,li->inf.Nature);
-         li=li->suivant;   }
+    printf("\n ************************* Table des symboles *************************\n");
+    printf("_________________________________________________________________________\n");
+    printf("\t|NomEntitée | NatureEntitée | TypeEntitée\n");
+    printf("-------------------------------------------------------------------------\n");
+    while(temp !=NULL)
+     {  printf("[\t%10s | %12d | %12d]\n",temp->Nom,temp->Nature,temp->Type);
+         temp=temp->suivant;   }
      printf("\n");
 }
 //--------------------------------------------------------------------------------------------------------------------------
-bool Search_element(ListElts li, char* s)
+bool Search_element(char* s)
 {
-    while (strcmp(li->inf.Nom, s)==0 && list_is_empty(li->suivant)==false)
-        li = li->suivant;
+    ListElts temp=symbole ;
+
+    while (strcmp(temp->Nom, s)==0 && list_is_empty(temp->suivant)==false)
+        temp = temp->suivant;
         
-    if (list_is_empty(li)==true)
+    if (list_is_empty(temp)==true)
         return true;
     else return false;
 }
 //--------------------------------------------------------------------------------------------------------------------------
-void insert(ListElts *li, info x)
+void insert(char nom[256], int nature, int type)
 {
     élément *element;
-    
+
     element=malloc(sizeof(*element));
     
     if (element==NULL) {
@@ -86,12 +98,73 @@ void insert(ListElts *li, info x)
         exit(EXIT_FAILURE);
     }
     
-    strcpy(element->inf.Nom, x.Nom);
-    element->inf.Type = x.Type;
-    element->inf.Nature = x.Nature;
-    
-    if(list_is_empty(*li))
+    strcpy(element->Nom, nom);
+    element->Type = type;
+    element->Nature = nature;
+    element->suivant=NULL;
+
+    if(list_is_empty(symbole)) symbole=element;
+    else{
+        ListElts temp=symbole ;
+
+        while (temp->suivant!=NULL)
+        {
+            temp = temp->suivant;
+        }
+
+        temp->suivant=element;
         element->suivant=NULL;
+    }
+}
+//--------------------------------------------------------------------------------------------------------------------------
+//fonctions pour gérer les files de noms d'idf
+//-----------------------------------------------------------------------
+bool queue_is_empty(void)
+{
+    if(first==NULL && last==NULL) return true;
+    else return false;
+}
+//----------------------------------------------------------------------- 
+char* queue_first(void)
+{
+    if(queue_is_empty())
+        exit(1);
     else
-        element->suivant=*li;
+        return first->NomIdf;
+}
+//-----------------------------------------------------------------------
+void push_queue(char x[256])
+{
+    QueueElement *element;
+    element=malloc(sizeof(*element));
+    if (element==NULL) {
+        fprintf(stderr, "problem d'alocation");
+    }
+    strcpy(element->NomIdf,x);
+    element->next=NULL;
+    if (queue_is_empty()) {
+        first = element;
+        last=element;
+    }
+    else{
+        last->next=element;
+        last=element;
+    }
+}
+//-----------------------------------------------------------------------
+void pop_queue(void)
+{
+    if (queue_is_empty()) {
+        printf("file vide");
+        return;
+    }
+    QueueElement *temp=first;
+    if (first==last) {
+        first=NULL;
+        last=NULL;
+    }
+    else
+        first=first->next;
+    free(temp);
+    temp=NULL;
 }

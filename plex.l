@@ -17,8 +17,8 @@ PDEC {return mc_PDEC;col=col+yyleng;}
 PINST {return mc_PINST;col=col+yyleng;}
 Begin {return mc_Begin;col=col+yyleng;}
 End {return mc_End;col=col+yyleng;}
-Pint {yylval.chaine=strdup(yytext); return mc_Pint; col=col+yyleng;}
-Pfloat {yylval.chaine=strdup(yytext); return mc_Pfloat; col=col+yyleng;}
+Pint {return mc_Pint; col=col+yyleng;}
+Pfloat {return mc_Pfloat; col=col+yyleng;}
 FOR {return mc_FOR ;col=col+yyleng;}
 WHILE {return mc_WHILE ;col=col+yyleng;}
 DO {return mc_DO ;col=col+yyleng;}

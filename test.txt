@@ -1,0 +1,17 @@
+Program p1
+PDEC
+m : Pfloat;
+r | v : Pint;
+@define Pint t=5;
+@define Pfloat z=5;
+PINST 
+Begin
+q<-3;
+s<-q+r;
+FOR i<-1 
+WHILE 5
+DO
+s<-s/2;
+r<-r+q;
+ENDFOR
+End
