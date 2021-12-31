@@ -220,3 +220,8 @@ void print_queue(void)
     } 
     return true;
 }
+//-----------------------------------------------------------------------
+bool affectation_constant(char* nom){
+    if(return_nature(nom)==1) return true;
+    else return false;
+}
