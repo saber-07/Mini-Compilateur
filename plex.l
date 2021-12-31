@@ -1,7 +1,7 @@
 %{
 #include <stdio.h>
 #include<string.h>
-#include "psynt.tab.h" 
+#include "psynt.tab.h"
 int ligne=1;
 int col=0;
 extern YYSTYPE yylval;
@@ -24,6 +24,7 @@ WHILE {return mc_WHILE ;col=col+yyleng;}
 DO {return mc_DO ;col=col+yyleng;}
 ENDFOR {return mc_ENDFOR ;col=col+yyleng;}
 IF {return mc_IF; col=col+yyleng;}
+ENDIF {return mc_ENDIF; col=col+yyleng;}
 ELSE {return mc_ELSE; col=col+yyleng;}
 "@define" {return mc_define; col=col+yyleng;}
 "|" {return barrelateral; col++;}
@@ -37,8 +38,8 @@ ELSE {return mc_ELSE; col=col+yyleng;}
 "-" {return Soustraction; col++;}
 "*" {return Multiplication; col++;}
 == {return Egal; col=col+2;}
-:< {return Inferieur; col=col+2;}
-:> {return Superieur; col=col+2;}
+"<" {return Inferieur; col=col+2;}
+">" {return Superieur; col=col+2;}
 "<=" {return Inferieurouegal; col=col+2;}
 ">=" {return Superieurouegal; col=col+2;}
 "!=" {return different; col=col+2;}

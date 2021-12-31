@@ -16,9 +16,11 @@ float reel;
 }
 %start S
 %token err mc_Program  mc_PDEC mc_PINST mc_Begin mc_End deuxpoints pvg mc_define mc_Pfloat mc_Pint
-%token aff division Affectation Addition Soustraction Multiplication barrelateral etcomercial pardroite pargauche 
-%token Superieur Inferieur Superieurouegal Inferieurouegal Egal different mc_FOR mc_WHILE mc_DO mc_ENDFOR mc_IF mc_ELSE
-%token <chaine>idf <entier>cst
+%token aff Affectation barrelateral etcomercial pardroite pargauche 
+%token Superieur Inferieur Superieurouegal Inferieurouegal Egal different mc_FOR mc_WHILE mc_DO mc_ENDFOR mc_IF mc_ELSE mc_ENDIF
+%token <chaine>idf <entier>cst 
+%left Addition Soustraction
+%left Multiplication division
 %type <entier>TYPE
 %%
 
@@ -35,7 +37,10 @@ DEC: DEC_VAR
     | DEC_CST 
 ;
 
-DEC_VAR : LIST_idf deuxpoints TYPE pvg {insert(queue_first(),0,$3); pop_queue();}
+DEC_VAR : LIST_idf deuxpoints TYPE pvg {while (!queue_is_empty()) {
+                                            insert(queue_first(),0,$3);
+                                            pop_queue();}
+                                            }
 ;
 
 LIST_idf : idf barrelateral LIST_idf {push_queue($1);}
@@ -63,8 +68,8 @@ TYPE_AFF: idf | cst | idf OPERATION cst | idf OPERATION idf
 INST_LOOP: mc_FOR idf Affectation cst mc_WHILE cst mc_DO PartieInstructions mc_ENDFOR
 ;
 
-INST_IF: mc_DO PartieInstructions mc_IF deuxpoints pardroite CONDITION pargauche 
-        | mc_DO PartieInstructions mc_IF deuxpoints pardroite CONDITION pargauche mc_ELSE PartieInstructions
+INST_IF: mc_DO PartieInstructions mc_IF deuxpoints pardroite CONDITION pargauche mc_ENDIF
+        | mc_DO PartieInstructions mc_IF deuxpoints pardroite CONDITION pargauche mc_ELSE PartieInstructions mc_ENDIF
 ;
 
 CONDITION: idf Expression_comparaison cst

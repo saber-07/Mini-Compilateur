@@ -77,44 +77,49 @@ void  print_list (void)
 //--------------------------------------------------------------------------------------------------------------------------
 bool Search_element(char* s)
 {
+    if (symbole==NULL) return true;
+    
     ListElts temp=symbole ;
-
-    while (strcmp(temp->Nom, s)==0 && list_is_empty(temp->suivant)==false)
+    
+    while (strcmp(temp->Nom, s)!=0 && temp->suivant!=NULL)
         temp = temp->suivant;
         
-    if (list_is_empty(temp)==true)
-        return true;
-    else return false;
+    if (strcmp(temp->Nom, s)==0)
+        return false;
+    else return true;
 }
 //--------------------------------------------------------------------------------------------------------------------------
 void insert(char nom[256], int nature, int type)
 {
-    élément *element;
+    if(Search_element(nom)){
+        élément *element;
 
-    element=malloc(sizeof(*element));
-    
-    if (element==NULL) {
-        fprintf(stderr, "probléme d'allocation dynamyque. \n");
-        exit(EXIT_FAILURE);
-    }
-    
-    strcpy(element->Nom, nom);
-    element->Type = type;
-    element->Nature = nature;
-    element->suivant=NULL;
-
-    if(list_is_empty(symbole)) symbole=element;
-    else{
-        ListElts temp=symbole ;
-
-        while (temp->suivant!=NULL)
-        {
-            temp = temp->suivant;
+        element=malloc(sizeof(*element));
+        
+        if (element==NULL) {
+            fprintf(stderr, "probléme d'allocation dynamique. \n");
+            exit(EXIT_FAILURE);
         }
-
-        temp->suivant=element;
+        
+        strcpy(element->Nom, nom);
+        element->Type = type;
+        element->Nature = nature;
         element->suivant=NULL;
+
+        if(list_is_empty(symbole)) symbole=element;
+        else{
+            ListElts temp=symbole ;
+
+            while (temp->suivant!=NULL)
+            {
+                temp = temp->suivant;
+            }
+
+            temp->suivant=element;
+            element->suivant=NULL;
+        }
     }
+    else printf("le symbole %s existe deja\n",nom);
 }
 //--------------------------------------------------------------------------------------------------------------------------
 //fonctions pour gérer les files de noms d'idf
@@ -167,4 +172,17 @@ void pop_queue(void)
         first=first->next;
     free(temp);
     temp=NULL;
+}
+
+void print_queue(void)
+{
+    if (queue_is_empty()) printf(" file vide");
+    
+    QueueElement *temp=first;
+    while (temp!=NULL)
+    {
+        printf("[%s]",temp->NomIdf);
+        temp=temp->next;
+    }
+    printf("\n");
 }
