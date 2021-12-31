@@ -11,7 +11,7 @@ s<-q+r;
 FOR i<-1 
 WHILE 5
 DO
-s<-s/2;
+m<-r;
 r<-r+q;
 ENDFOR
 End

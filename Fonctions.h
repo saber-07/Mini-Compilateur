@@ -77,7 +77,7 @@ void  print_list (void)
 //--------------------------------------------------------------------------------------------------------------------------
 bool Search_element(char* s)
 {
-    if (symbole==NULL) return true;
+    if (symbole==NULL) return false;
     
     ListElts temp=symbole ;
     
@@ -85,13 +85,13 @@ bool Search_element(char* s)
         temp = temp->suivant;
         
     if (strcmp(temp->Nom, s)==0)
-        return false;
-    else return true;
+        return true;
+    else return false;
 }
 //--------------------------------------------------------------------------------------------------------------------------
 void insert(char nom[256], int nature, int type)
 {
-    if(Search_element(nom)){
+    if(!Search_element(nom)){
         élément *element;
 
         element=malloc(sizeof(*element));
@@ -110,16 +110,39 @@ void insert(char nom[256], int nature, int type)
         else{
             ListElts temp=symbole ;
 
-            while (temp->suivant!=NULL)
-            {
-                temp = temp->suivant;
-            }
+            while (temp->suivant!=NULL) temp = temp->suivant;
 
             temp->suivant=element;
             element->suivant=NULL;
         }
     }
     else printf("le symbole %s existe deja\n",nom);
+}
+//--------------------------------------------------------------------------------------------------------------------------
+int return_type(char* nom){
+    if (Search_element(nom))
+    {
+        ListElts temp=symbole ;
+        while (temp->suivant!=NULL && strcmp(temp->Nom, nom)!=0) temp = temp->suivant;
+        return temp->Type;
+    }
+    else {
+        printf("le symbole %s n'existe pas \n",nom);
+        return -1;
+    }
+}
+//--------------------------------------------------------------------------------------------------------------------------
+int return_nature(char* nom){
+    if (Search_element(nom))
+    {
+        ListElts temp=symbole ;
+        while (temp->suivant!=NULL && strcmp(temp->Nom, nom)!=0) temp = temp->suivant;
+        return temp->Nature;
+    }
+    else {
+        printf("le symbole %s n'existe pas \n",nom);
+        return -1;
+    }
 }
 //--------------------------------------------------------------------------------------------------------------------------
 //fonctions pour gérer les files de noms d'idf
@@ -174,6 +197,7 @@ void pop_queue(void)
     temp=NULL;
 }
 
+//-----------------------------------------------------------------------
 void print_queue(void)
 {
     if (queue_is_empty()) printf(" file vide");
@@ -185,4 +209,14 @@ void print_queue(void)
         temp=temp->next;
     }
     printf("\n");
+}
+//-----------------------------------------------------------------------
+//routine sémantique
+//-----------------------------------------------------------------------
+
+ bool compatible_type(int type1,int type2){
+    if(type1 != type2) {
+        return false;
+    } 
+    return true;
 }

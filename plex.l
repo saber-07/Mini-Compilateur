@@ -47,7 +47,7 @@ ELSE {return mc_ELSE; col=col+yyleng;}
 ; {return pvg; col++;}
 [ \t] col++;
 [\n] {ligne++;col=0;}
-{idf} {if (yyleng<12) { yylval.chaine=strdup(yytext); return idf;}
+{idf} {if (yyleng<=12) { yylval.chaine=strdup(yytext); return idf;}
         else printf("erreur lexicale à la ligne %d:l'idf %s trop Long/n",ligne,yytext);
         }
 {cst} {yylval.entier=atoi(yytext); return cst;}

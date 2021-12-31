@@ -59,10 +59,12 @@ PartieInstructions: INST PartieInstructions | INST
 INST: INST_AFF | INST_LOOP | INST_IF
 ;
 
-INST_AFF: idf Affectation TYPE_AFF pvg
-;
-
-TYPE_AFF: idf | cst | idf OPERATION cst | idf OPERATION idf
+INST_AFF: idf Affectation idf pvg { if(!Search_element($1)) printf("erreur sémantique %s non déclarer à la ligne %d",$1,ligne);
+                                    if(!compatible_type(return_type($1),return_type($3))) printf("erreur semantique, incompatibilite de type \n"); }
+        | idf Affectation cst pvg { if(!Search_element($1)) printf("erreur sémantique %s non déclarer à la ligne %d",$1,ligne);
+                                    if(!compatible_type(return_type($1),0)) printf("erreur semantique, incompatibilite de type \n"); }
+        | idf Affectation idf OPERATION cst pvg
+        | idf Affectation idf OPERATION idf pvg
 ;
 
 INST_LOOP: mc_FOR idf Affectation cst mc_WHILE cst mc_DO PartieInstructions mc_ENDFOR
