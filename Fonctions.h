@@ -116,7 +116,7 @@ void insert(char nom[256], int nature, int type)
             element->suivant=NULL;
         }
     }
-    else printf("le symbole %s existe deja\n",nom);
+    else printf("le symbole %s est deja déclaré\n",nom);
 }
 //--------------------------------------------------------------------------------------------------------------------------
 int return_type(char* nom){

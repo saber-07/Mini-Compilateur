@@ -9,8 +9,9 @@ extern YYSTYPE yylval;
 chiffre [0-9]
 lettre [a-zA-Z]
 idf {lettre}({lettre}|{chiffre}|_)*(({lettre}|{chiffre}))*
-cst  [1-9]|0{chiffre}*
-
+cst_e  [+-]?[1-9]|{chiffre}*
+cst_r  [+-]?[1-9]{chiffre}*[.]{chiffre}{chiffre}*
+commantaire1 "//"({lettre}|{chiffre})*
 %%
 Program {return mc_Program; col=col+yyleng;}
 PDEC {return mc_PDEC;col=col+yyleng;}
@@ -29,8 +30,8 @@ ELSE {return mc_ELSE; col=col+yyleng;}
 "@define" {return mc_define; col=col+yyleng;}
 "|" {return barrelateral; col++;}
 "/" {return division; col++;}
-"(" {return pardroite; col++;}
-")" {return pargauche; col++;}
+")" {return pardroite; col++;}
+"(" {return pargauche; col++;}
 : {return deuxpoints; col++;}
 = {return aff; col++;}
 "<-" {return Affectation; col=col+2;}
@@ -44,13 +45,16 @@ ELSE {return mc_ELSE; col=col+yyleng;}
 ">=" {return Superieurouegal; col=col+2;}
 "!=" {return different; col=col+2;}
 &  {return etcomercial; col++;}
+! {return negation; col++;}
 ; {return pvg; col++;}
 [ \t] col++;
 [\n] {ligne++;col=0;}
+{cst_e} {yylval.entier=atoi(yytext); return cst_e;}
+{cst_r} {yylval.entier=atof(yytext); return cst_r;}
 {idf} {if (yyleng<=12) { yylval.chaine=strdup(yytext); return idf;}
         else printf("erreur lexicale à la ligne %d:l'idf %s trop Long/n",ligne,yytext);
         }
-{cst} {yylval.entier=atoi(yytext); return cst;}
+{commantaire1} {ligne++;}
 . {printf("\nErreur lexical à la ligne %d sur l'entitée %s\n",ligne,yytext);
               return err;}
 
