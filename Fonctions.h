@@ -19,6 +19,16 @@ typedef struct élément
     struct élément *suivant;
 }élément, *ListElts;
 
+//def d'une liste d'symbole avec leur valeur
+typedef struct id
+{
+    char Nom[256];
+    int Type; // 0=int , 1=float
+    int Entier;
+    float Reel;
+    struct id *suivant;
+}id, *Listid;
+
 //def d'une file de nom d'idf
 typedef struct QueueElement
 {
@@ -33,6 +43,9 @@ static QueueElement *last=NULL;
 //la liste de symbole
 ListElts symbole=NULL;
 
+//la liste des id
+Listid identifiants=NULL;
+
 //--------------------------------------------------------------------------------------------------------------------------
 bool list_is_empty(ListElts li)
 {
@@ -40,20 +53,7 @@ bool list_is_empty(ListElts li)
         return  true;
     else return false;
 }
-//--------------------------------------------------------------------------------------------------------------------------
 
-int list_length(ListElts li)
-{
-    int i=0;
-    if (!list_is_empty(li))
-    {
-        while (li != NULL) {
-            i++;
-            li=li->suivant;
-        }
-    }
-    return i;
-}
 //--------------------------------------------------------------------------------------------------------------------------
 
 void  print_list (void)
@@ -65,12 +65,12 @@ void  print_list (void)
         printf("rien a afficher liste vide \n");
         return;
     }
-    printf("\n ************************* Table des symboles *************************\n");
-    printf("_________________________________________________________________________\n");
-    printf("\t|NomEntitée | NatureEntitée | TypeEntitée\n");
-    printf("-------------------------------------------------------------------------\n");
+    printf("\n ****************** Table des symboles *****************\n");
+    printf("_________________________________________________________\n");
+    printf("\t|NomEntitée | NatureEntitée | TypeEntitée\n");          
+    printf("---------------------------------------------------------\n");
     while(temp !=NULL)
-     {  printf("[\t%10s | %12d | %12d]\n",temp->Nom,temp->Nature,temp->Type);
+     {  printf("[\t%11s | %13d | %12d\t]\n",temp->Nom,temp->Nature,temp->Type);
          temp=temp->suivant;   }
      printf("\n");
 }
@@ -198,18 +198,151 @@ void pop_queue(void)
 }
 
 //-----------------------------------------------------------------------
-void print_queue(void)
+// list id
+//--------------------------------------------------------------------------------------------------------------------------
+bool list_empty(Listid li)
 {
-    if (queue_is_empty()) printf(" file vide");
-    
-    QueueElement *temp=first;
-    while (temp!=NULL)
-    {
-        printf("[%s]",temp->NomIdf);
-        temp=temp->next;
-    }
-    printf("\n");
+    if(li==NULL)
+        return  true;
+    else return false;
 }
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool Search_id(char* s)
+{
+    if (identifiants==NULL) return false;
+    
+    Listid temp=identifiants ;
+    
+    while (strcmp(temp->Nom, s)!=0 && temp->suivant!=NULL)
+        temp = temp->suivant;
+        
+    if (strcmp(temp->Nom, s)==0)
+        return true;
+    else return false;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void insert_int(char nom[256], int type, int entier)
+{
+    id *element;
+
+    element=malloc(sizeof(*element));
+    
+    if (element==NULL) {
+        fprintf(stderr, "probléme d'allocation dynamyque. \n");
+        exit(EXIT_FAILURE);
+    }
+    
+    strcpy(element->Nom, nom);
+    element->Type = type;
+    element->Entier = entier;
+    element->suivant=NULL;
+
+    if(list_empty(identifiants)) identifiants=element;
+    else{
+        Listid temp=identifiants ;
+
+        while (temp->suivant!=NULL)
+        {
+            temp = temp->suivant;
+        }
+
+        temp->suivant=element;
+        element->suivant=NULL;
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void insert_float(char nom[256], int type, float reel)
+{
+    id *element;
+
+    element=malloc(sizeof(*element));
+    
+    if (element==NULL) {
+        fprintf(stderr, "probléme d'allocation dynamyque. \n");
+        exit(EXIT_FAILURE);
+    }
+    
+    strcpy(element->Nom, nom);
+    element->Type = type;
+    element->Reel = reel;
+    element->suivant=NULL;
+
+    if(list_empty(identifiants)) identifiants=element;
+    else{
+        Listid temp=identifiants ;
+
+        while (temp->suivant!=NULL)
+        {
+            temp = temp->suivant;
+        }
+
+        temp->suivant=element;
+        element->suivant=NULL;
+    }
+}
+//-----------------------------------------------------------------------
+
+void  print_id(void)
+{
+    Listid temp=identifiants ;
+
+    if(list_empty(identifiants)) printf("rien a afficher liste vide \n");
+    
+    printf("\n *********** Table des identifiants ************\n");
+    printf("_________________________________________________\n");
+    printf("\t|Nom Identifiant | Valeur Identifiant\n");          
+    printf("-------------------------------------------------\n");
+    while(temp !=NULL){
+        if(temp->Type==0) printf("[\t%16s | %16d\t]\n",temp->Nom,temp->Entier);
+        else printf("[\t%16s | %16.2f\t]\n",temp->Nom,temp->Reel);
+        temp=temp->suivant;
+    }
+     printf("\n");
+}
+//-----------------------------------------------------------------------
+
+int return_int(char* nom){
+    if (Search_element(nom)) {
+        Listid temp=identifiants;
+        while (temp->suivant!=NULL && strcmp(temp->Nom, nom)!=0) temp=temp->suivant;
+        return temp->Entier;
+    }
+    else{
+        printf("le symbole %s n'existe pas \n",nom);
+                return -1;
+    }
+}
+//-----------------------------------------------------------------------
+
+float return_float(char* nom){
+    if (Search_element(nom)) {
+        Listid temp=identifiants;
+        while (temp->suivant!=NULL && strcmp(temp->Nom, nom)!=0) temp=temp->suivant;
+        return temp->Reel;
+    }
+    else{
+        printf("le symbole %s n'existe pas \n",nom);
+                return -1;
+    }
+}
+//-----------------------------------------------------------------------
+
+void replace_int(char* nom, int val){
+    Listid temp=identifiants;
+    while (temp->suivant!=NULL && strcmp(temp->Nom, nom)!=0) temp=temp->suivant;
+    temp->Entier=val;
+}
+//-----------------------------------------------------------------------
+
+void replace_float(char* nom, float val){
+    Listid temp=identifiants;
+    while (temp->suivant!=NULL && strcmp(temp->Nom, nom)!=0) temp=temp->suivant;
+    temp->Reel=val;
+}
+
 //-----------------------------------------------------------------------
 //routine sémantique
 //-----------------------------------------------------------------------
@@ -220,6 +353,7 @@ void print_queue(void)
     } 
     return true;
 }
+
 //-----------------------------------------------------------------------
 bool affectation_constant(char* nom){
     if(return_nature(nom)==1) return true;

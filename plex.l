@@ -9,9 +9,10 @@ extern YYSTYPE yylval;
 chiffre [0-9]
 lettre [a-zA-Z]
 idf {lettre}({lettre}|{chiffre}|_)*(({lettre}|{chiffre}))*
-cst_e  [+-]?[1-9]|{chiffre}*
-cst_r  [+-]?[1-9]{chiffre}*[.]{chiffre}{chiffre}*
-commantaire1 "//"({lettre}|{chiffre})*
+cst_e  "-"?{chiffre}*
+cst_r  "-"?({chiffre}+[.]{chiffre}+)
+commantaire1 "//"(.)*
+Pcommantaire "/*"(.|\n)*"*/" 
 %%
 Program {return mc_Program; col=col+yyleng;}
 PDEC {return mc_PDEC;col=col+yyleng;}
@@ -50,11 +51,12 @@ ELSE {return mc_ELSE; col=col+yyleng;}
 [ \t] col++;
 [\n] {ligne++;col=0;}
 {cst_e} {yylval.entier=atoi(yytext); return cst_e;}
-{cst_r} {yylval.entier=atof(yytext); return cst_r;}
+{cst_r} {yylval.reel=atof(yytext); return cst_r;}
 {idf} {if (yyleng<=12) { yylval.chaine=strdup(yytext); return idf;}
         else printf("erreur lexicale à la ligne %d:l'idf %s trop Long/n",ligne,yytext);
         }
 {commantaire1} {ligne++;}
+{Pcommantaire} {ligne=ligne+2;}
 . {printf("\nErreur lexical à la ligne %d sur l'entitée %s\n",ligne,yytext);
               return err;}
 
